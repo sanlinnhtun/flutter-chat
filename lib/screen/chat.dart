@@ -19,7 +19,7 @@ class _ChattingPageState extends State<ChattingPage> {
   void initState() {
     super.initState();
     getUser();
-    getDataFromFirestore();
+    // getDataFromFirestore();
   }
 
   getUser() {
@@ -28,13 +28,13 @@ class _ChattingPageState extends State<ChattingPage> {
     });
   }
 
-  getDataFromFirestore() async {
-    // GET DATA ONLY ONCE
-    var mydata = await firestore.collection('flutterchat').get();
-    for (var message in mydata.docs) {
-      print(message.data());
-    }
-  }
+  // getDataFromFirestore() async {
+  //   // GET DATA ONLY ONCE
+  //   var mydata = await firestore.collection('flutterchat').get();
+  //   for (var message in mydata.docs) {
+  //     print(message.data());
+  //   }
+  // }
   //   print(">>>>>>>>>>>>>>>>>>>");
   //   // GET DATA with STREAM - Snapshots
   //   await for (var snapshot
@@ -61,45 +61,43 @@ class _ChattingPageState extends State<ChattingPage> {
       ),
       body: Column(
         children: [
-         StreamBuilder(
-  stream: firestore.collection('flutterchat').snapshots(),
-  builder: (context, snapshot) {
-    List<Widget> messageList = [];
-    if (snapshot.hasData) {
-      for (var message in snapshot.data!.docs) {
-        bool isCurrentUser = currentUser!.email == message['sender'];
-        messageList.add(
-          Row(
-            mainAxisAlignment:
-                isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(8.0),
-                padding: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.circular(10.0),
+          StreamBuilder(
+            stream: firestore.collection('gameroom').orderBy('timestamp', descending: true).snapshots(),
+            builder: (context, snapshot) {
+              List<Widget> messageList = [];
+              if (snapshot.hasData) {
+                for (var message in snapshot.data!.docs) {
+                  bool isCurrentUser = currentUser!.email == message['sender'];
+                  messageList.add(
+                    Row(
+                      mainAxisAlignment: isCurrentUser
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: isCurrentUser ? Colors.blue : Colors.grey,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Text(
+                            "${message['message']}",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }
+              return Expanded(
+                child: ListView(
+                  reverse: true,
+                  children: messageList,
                 ),
-                child: Text(
-                  "${message['message']}",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-    return Column(
-      children: messageList,
-    );
-  },
-),
-
-          Expanded(
-            child: Container(
-              color: Colors.white,
-            ),
+              );
+            },
           ),
           Padding(
             padding: EdgeInsets.all(8.0),
@@ -115,23 +113,26 @@ class _ChattingPageState extends State<ChattingPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     suffixIcon: IconButton(
-                        onPressed: () async {
-                          try {
-                            await firestore.collection("flutterchat").add(
-                              {
-                                "sender": currentUser!.email,
-                                "message": msg.text,
-                              },
-                            );
-                          } catch (e) {
-                            print(e);
-                          }
-                        },
-                        icon: Icon(
-                          Icons.telegram_outlined,
-                          size: 40,
-                          color: Colors.green,
-                        )),
+                      onPressed: () async {
+                        try {
+                          await firestore.collection("gameroom").add(
+                            {
+                              "sender": currentUser!.email,
+                              "message": msg.text,
+                              "timestamp": FieldValue.serverTimestamp(),
+                            },
+                          );
+                          msg.clear();
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.telegram_outlined,
+                        size: 40,
+                        color: Colors.green,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -142,3 +143,22 @@ class _ChattingPageState extends State<ChattingPage> {
     );
   }
 }
+
+// class MessageBubble extends StatelessWidget {
+//   const MessageBubble({super.key, required this.sender, required this.message});
+//   final String sender;
+//   final String message;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.end,
+//       children: [
+//         Column(
+//           crossAxisAlignment: CrossAxisAlignment.end,
+//           children: [],
+//         )
+//       ],
+//     );
+//   }
+// }
