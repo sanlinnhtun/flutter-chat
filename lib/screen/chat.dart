@@ -62,7 +62,7 @@ class _ChattingPageState extends State<ChattingPage> {
       body: Column(
         children: [
           StreamBuilder(
-            stream: firestore.collection('gameroom').orderBy('timestamp', descending: true).snapshots(),
+            stream: firestore.collection('gameroom').orderBy('timeStemp', descending: true).snapshots(),
             builder: (context, snapshot) {
               List<Widget> messageList = [];
               if (snapshot.hasData) {
@@ -119,7 +119,7 @@ class _ChattingPageState extends State<ChattingPage> {
                             {
                               "sender": currentUser!.email,
                               "message": msg.text,
-                              "timestamp": FieldValue.serverTimestamp(),
+                              "timeStemp": FieldValue.serverTimestamp(),
                             },
                           );
                           msg.clear();

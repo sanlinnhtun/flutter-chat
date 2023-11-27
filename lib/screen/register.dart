@@ -15,6 +15,8 @@ class _RegisterPageState extends State<RegisterPage> {
     TextEditingController email = TextEditingController();
     TextEditingController pass = TextEditingController();
     bool isLoading = true;
+    bool _passwordVisible = false;
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -45,21 +47,32 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
           Positioned(
-            top: 200,
-            left: 10,
-            right: 10,
-            child: TextField(
-              controller: pass,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                hintText: 'Enter your password',
-                prefixIcon: Icon(Icons.remove_red_eye_sharp),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                ),
-              ),
+      top: 200,
+      left: 10,
+      right: 10,
+      child: TextField(
+        controller: pass,
+        decoration: InputDecoration(
+          labelText: 'Password',
+          hintText: 'Enter your password',
+          suffixIcon: GestureDetector(
+            onTap: () {
+              setState(() {
+                _passwordVisible = !_passwordVisible;
+              });
+            },
+            child: Icon(
+              _passwordVisible ? Icons.visibility : Icons.visibility_off,
             ),
           ),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+        ),
+        obscureText: _passwordVisible,
+      ),
+    ),
+
           Positioned(
               top: 275,
               left: 80,
@@ -68,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: () async {
                     try {
                       setState(() {
-                        isLoading = false;
+                        _passwordVisible = !_passwordVisible;
                       });
                       UserCredential newUser = await FirebaseAuth.instance
                           .createUserWithEmailAndPassword(

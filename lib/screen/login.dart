@@ -14,11 +14,13 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   bool isLoading = true;
+  bool _passwordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
+        title: const Center(
           child: Text("Welcom to login page"),
         ),
       ),
@@ -51,14 +53,24 @@ class _LoginPageState extends State<LoginPage> {
             right: 10,
             child: TextField(
               controller: pass,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Password',
                 hintText: 'Enter your password',
-                prefixIcon: Icon(Icons.remove_red_eye_sharp),
-                border: OutlineInputBorder(
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _passwordVisible = !_passwordVisible;
+                    });
+                  },
+                  child: Icon(_passwordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                ),
+                border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 ),
               ),
+              obscureText: _passwordVisible,
             ),
           ),
           Positioned(
@@ -70,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                     try {
                       setState(() {
                         isLoading = false;
+                        _passwordVisible = !_passwordVisible;
                       });
                       UserCredential newUser = await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
@@ -78,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                       );
                       final user = newUser.user;
                       await user!.sendEmailVerification();
+                      // ignore: use_build_context_synchronously
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -85,15 +99,15 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'weak-password') {
-                        print('The password provided is too weak.');
+                        debugPrint('The password provided is too weak.');
                       } else if (e.code == 'email-already-in-use') {
-                        print('The account already exists for that email.');
+                        debugPrint('The account already exists for that email.');
                       }
                     } catch (e) {
                       print(e);
                     }
                   },
-                  child: Text('Login')))
+                  child: const Text('Login')))
         ],
       ),
     );
