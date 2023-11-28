@@ -23,7 +23,7 @@ class _NavigaPageState extends State<NavigaPage> {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'images/413E994C-90D0-4768-AED9-337B8B9B7575.jpeg',
+              'images/social-media-icons-rendering.jpg',
               fit: BoxFit.cover,
             ),
             Positioned(

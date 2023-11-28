@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            "images/35C94846-6DC5-4C92-BA45-AE2D44EBEF37.jpeg",
+            "images/social-media-icons-rendering (1).jpg",
             fit: BoxFit.cover,
           ),
           Positioned(
